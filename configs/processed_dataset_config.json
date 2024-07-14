@@ -1,0 +1,12 @@
+{
+  "dataset_path": "/home/mill/Desktop/face-recognition/processed_dataset",
+  "processed_path": null,
+  "csv_path": "csv/processed_image_quality_metrics.csv",
+  "laplacian_variance_low": 100,
+  "laplacian_variance_high": 1000,
+  "mean_intensity_low": 50,
+  "mean_intensity_high": 200,
+  "standard_deviation_low": 10,
+  "standard_deviation_high": 100,
+  "min_resolution": 10000
+}

@@ -1,0 +1,41 @@
+{
+  "input_csv": "csv/original_image_quality_metrics.csv",
+  "output_dir": "visualizations/original_image",
+  "visualizations": [
+    {
+      "column": "label",
+      "title": "Age Distribution",
+      "xlabel": "Age",
+      "ylabel": "Number of Images",
+      "output_file": "age_distribution.png"
+    },
+    {
+      "column": "laplacian_variance",
+      "title": "Laplacian Variance Distribution",
+      "xlabel": "Laplacian Variance",
+      "ylabel": "Number of Images",
+      "output_file": "laplacian_variance_distribution.png"
+    },
+    {
+      "column": "mean",
+      "title": "Mean Intensity Distribution",
+      "xlabel": "Mean Intensity",
+      "ylabel": "Number of Images",
+      "output_file": "mean_intensity_distribution.png"
+    },
+    {
+      "column": "standard_deviation",
+      "title": "Standard Deviation Distribution",
+      "xlabel": "Standard Deviation",
+      "ylabel": "Number of Images",
+      "output_file": "standard_deviation_distribution.png"
+    },
+    {
+      "column": "resolution",
+      "title": "Resolution Distribution",
+      "xlabel": "Resolution (Total Pixels)",
+      "ylabel": "Number of Images",
+      "output_file": "resolution_distribution.png"
+    }
+  ]
+}
