@@ -163,4 +163,41 @@ Poor lighting can be quantified using the mean intensity of the image. Images th
   - Too High: $> 100$ (indicates significant noise)
 - **Resolution:**
   - Typically, images with resolution less than a certain threshold (e.g., $100 \times 100$ pixels) are considered low resolution.
+## Image Processing
 
+### 1. Too Blurry
+
+Technique: Sharpening
+
+- Unsharp Masking: Enhances the edges in the image by subtracting a blurred version of the image from the original image.
+- High-Pass Filtering: Emphasizes high-frequency components (edges) in the image.
+
+### 2. Too Noisy (High Laplacian Variance or High Standard Deviation)
+
+Technique: Denoising
+
+- Gaussian Blur: Reduces image noise and detail by applying a Gaussian filter.
+- Median Filtering: Reduces salt-and-pepper noise by replacing each pixel with the median value in its neighborhood.
+- Bilateral Filtering: Reduces noise while preserving edges.
+    
+### 3. Too Dark & Too Bright
+
+Technique: Brightness Adjustment
+
+- Histogram Equalization: Enhances the contrast of images by spreading out the most frequent intensity values.
+- Gamma Correction: Adjusts the brightness by applying a gamma value to the pixel values.
+    
+    
+### 4. Lack of Texture
+
+Technique: Texture Enhancement
+
+- High-Pass Filtering: Enhances textures and edges by removing low-frequency components.
+- Histogram Equalization: Enhances the contrast and can bring out textures.
+    
+### 5. Low Resolution
+
+Technique: Super-Resolution
+
+- Super-Resolution Techniques: Enhance the resolution of an image using machine learning models or interpolation methods.
+- Interpolation: Methods like bilinear or bicubic interpolation to increase image size.
