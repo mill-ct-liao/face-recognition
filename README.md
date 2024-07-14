@@ -201,3 +201,175 @@ Technique: Super-Resolution
 
 - Super-Resolution Techniques: Enhance the resolution of an image using machine learning models or interpolation methods.
 - Interpolation: Methods like bilinear or bicubic interpolation to increase image size.
+
+## Resampling
+
+The resampling process is a crucial part of ensuring that the dataset used for training machine learning models is balanced and representative of the target population distribution. The goal is to modify the dataset to match the desired distribution, which can help improve the model's performance and generalizability.
+
+### 1. Analyze the Target Distribution:
+- The target distribution, such as the 2021 Australian population distribution, provides the basis for how the dataset should be resampled.
+- This distribution is used to calculate the required number of images for each age group to ensure the dataset is balanced.
+
+![image](visualizations/australian_population_distribution.png)
+
+### 2. Calculate Required Images:
+- The number of required images for each age group is calculated based on the target distribution.
+- For example, if the dataset contains 20,000 images and the target distribution indicates that 7.1% of the population is aged 25 to 29, then approximately 1,420 images should represent this age group.
+
+### 3. Assess Current Distribution:
+- The current distribution of images across age groups is analyzed to determine the number of images currently available for each group.
+- This analysis helps identify any imbalances in the dataset.
+
+### 4. Determine Image Difference:
+- The difference between the required number of images and the current number of images is calculated for each age group.
+- Positive values indicate the need for more images (up-sampling), while negative values indicate an excess of images (down-sampling).
+
+### 5. Perform Up-sampling and Down-sampling:
+- Up-sampling: For age groups with fewer images than required, additional images are generated using data augmentation techniques. These techniques may include rotation, flipping, and color adjustment to create new, unique images from the existing ones.
+- Down-sampling: For age groups with more images than required, a random selection of images is removed to reduce the number to the desired level.
+
+### 6. Validate Resampling:
+- After the resampling process, the new distribution of images is validated against the target distribution to ensure the resampling process has achieved the desired balance.
+
+## Model Development & Training and Evaluation
+
+The train_model.py script is designed to train a deep learning model for age classification using the SqueezeNet architecture. This script preprocesses the data, defines the model, trains it, and evaluates its performance using metrics like loss and AUC (Area Under the Curve).
+
+### Data Preparation
+
+The data preparation involves:
+
+#### 1. Defining a Custom Dataset:
+- The AgeDataset class is used to load images from the resampled_dataset directory.
+- Images are labeled based on their subdirectory names, which correspond to the age group.
+
+#### 2. Applying Transformations:
+- Images are resized to 128x128 pixels.
+- Images are normalized using the mean and standard deviation of the ImageNet dataset.
+
+#### 3. Creating Data Loaders:
+- The dataset is split into training and validation sets (80% training, 20% validation).
+- Data loaders are created for both sets to facilitate batch processing during training.
+
+### Model Definition
+
+The AgeClassifier class defines the model architecture using the SqueezeNet model:
+
+- The final classification layer of SqueezeNet is replaced with a convolutional layer to output 31 classes, corresponding to ages 20 to 50.
+- The model is chosen specifically because its number of parameters does not exceed 1 million, making it suitable for deployment on edge devices.
+
+### Training Process
+
+The training process involves:
+
+#### 1. Defining Loss Function and Optimizer:
+- The CrossEntropyLoss function is used as the loss criterion.
+- The Adam optimizer is used for parameter updates.
+
+#### 2. Training Loop:
+- The model is trained for a specified number of epochs.
+- For each epoch, the model goes through a training phase and a validation phase.
+- Metrics such as loss and AUC are calculated and stored for each epoch.
+
+#### 3. Saving the Best Model:
+- The model weights that yield the best validation AUC are saved.
+
+#### 4. Parameter Count Check:
+- The script checks the number of parameters in the model and ensures it does not exceed 1 million. This is critical for deployment on edge devices where resources are limited.
+
+### Performance Visualization
+
+The script generates visualizations for the training and validation metrics:
+
+![image](visualizations/train_model.png)
+
+#### 1. Training and Validation Loss:
+- The left plot in the figure shows the training and validation loss over the epochs.
+- The training loss decreases steadily, indicating that the model is learning from the data.
+- The validation loss, however, shows some fluctuations and starts to increase slightly after a few epochs, suggesting potential overfitting.
+
+#### 2. Training and Validation AUC:
+- The right plot in the figure shows the training and validation AUC over the epochs.
+- The training AUC increases consistently, indicating improving model performance on the training set.
+- The validation AUC increases initially but then fluctuates, which again might suggest overfitting or variability in validation performance.
+
+### Conclusion
+
+The model achieved the best validation AUC as indicated in the training logs. The generated plots provide a clear view of the model's learning process and highlight areas where improvements can be made, such as addressing potential overfitting.
+
+## Model Packaging for C++ Deployment
+
+To hand over the trained age prediction model to a C++ developer for seamless integration into a C++ pipeline, follow these steps:
+
+### 1. Export the Trained Model:
+- Save the trained PyTorch model using the torch.save() function. This creates a .pth file containing the model's state_dict (weights and biases).
+
+### 2. Convert the Model to ONNX Format:
+- Convert the saved PyTorch model to ONNX (Open Neural Network Exchange) format using the torch.onnx.export() function. ONNX is a widely supported format for machine learning models, making it easier to integrate into various platforms, including C++.
+
+### 3. Prepare Preprocessing Scripts:
+- Create a Python script for image preprocessing and normalization. This script should include all the steps necessary to prepare input images for the model, such as resizing, normalization, and any other required transformations.
+
+### 4. Package the Model and Scripts:
+- Package the ONNX model file and the preprocessing scripts together. Ensure that all necessary dependencies are included and that the C++ developer has clear instructions on how to use these files.
+
+### 5. Provide Usage Instructions:
+- Write detailed instructions for the C++ developer, explaining how to load the ONNX model and use the preprocessing scripts. Include information on the expected input format and any required dependencies or environment setup.
+
+### 6. Integrate with C++ Pipeline:
+- Instruct the C++ developer to use an ONNX runtime (such as ONNX Runtime or TensorRT) to load and run the model. The preprocessing script can be used to prepare the images before passing them to the model for inference.
+
+## Steps for Using the Packaged Model in C++
+
+### 1. Load the ONNX Model:
+- Use an ONNX runtime library to load the ONNX model file. This will involve initializing the runtime and loading the model into memory.
+
+### 2. Preprocess Input Images:
+- Use the provided Python preprocessing script to prepare input images. This script should handle tasks like resizing, normalization, and any other required transformations.
+
+### 3. Run Inference:
+- Pass the preprocessed images to the ONNX model using the runtime library. Perform inference to obtain age predictions.
+
+### 4. Post-process Predictions:
+- Convert the model's output to meaningful age predictions. This may involve mapping the model's output to specific age groups.
+
+### 5. Integrate into C++ Application:
+- Integrate the entire process into the existing C++ pipeline, ensuring that the image preprocessing, model inference, and post-processing steps are all correctly implemented.
+
+## Future Work
+### Potential Improvements to the Model
+
+#### 1. Model Architecture Enhancements:
+- Explore more advanced or efficient model architectures such as EfficientNet or MobileNetV3. These architectures may offer better performance or reduced computational requirements, which is crucial for deployment on edge devices.
+
+#### 2. Hyperparameter Optimization:
+- Conduct extensive hyperparameter tuning to optimize the learning rate, batch size, and other parameters. Techniques such as grid search or Bayesian optimization can be employed to find the best combination of hyperparameters.
+
+#### 3. Transfer Learning:
+- Utilize pre-trained models on larger datasets and fine-tune them on the age prediction dataset. Transfer learning can significantly improve model performance, especially with limited data.
+
+#### 4. Model Quantization:
+- Apply model quantization techniques to reduce the model size and increase inference speed on edge devices. Quantization-aware training can help in maintaining model accuracy while reducing computational requirements.
+
+### Potential Improvements to the Pipeline
+
+#### 1. Automated Data Pipeline:
+- Develop an automated pipeline for data preprocessing, augmentation, and quality assessment. This would streamline the data preparation process and ensure consistent data quality.
+
+#### 2. Real-time Inference:
+- Optimize the pipeline for real-time inference, enabling the model to make predictions with minimal latency. This is particularly important for applications where timely predictions are critical.
+
+#### 3. Scalability:
+- Enhance the scalability of the pipeline to handle larger datasets and more complex models. Implementing distributed computing techniques and leveraging cloud resources can help achieve this.
+
+#### 4. Robust Error Handling:
+- Implement robust error handling and logging mechanisms throughout the pipeline. This would ensure that any issues are promptly identified and addressed, improving the overall reliability of the system.
+
+#### 5. Continuous Monitoring and Evaluation:
+- Set up a continuous monitoring and evaluation framework to track the model's performance over time. This would help in identifying any degradation in performance and facilitate timely updates to the model.
+
+#### 6. Integration with C++:
+- Provide comprehensive documentation and support for integrating the model with C++ applications. This would make it easier for developers to deploy the model in production environments.
+
+#### 7. Security Enhancements:
+- Implement security measures to protect the model and data. This includes encryption of sensitive data, secure model deployment, and access control mechanisms.
