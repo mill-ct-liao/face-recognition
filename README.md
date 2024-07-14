@@ -37,11 +37,11 @@ Directories
 
 ### Detailed Component Descriptions
 
-#### utils.py
+#### `utils.py`
 
 - Contains utility functions for tasks such as reading configuration files, logging, and common data processing steps.
 
-#### explore_images.py
+#### `explore_images.py`
 
 - Reads a configuration file for parameters.
 - Loads images from the dataset directory.
@@ -49,43 +49,118 @@ Directories
 - Checks the quality of images based on defined thresholds.
 - Generates a CSV file with metadata for all images.
 
-#### image_reader.py
+#### `image_reader.py`
 
 - load_dataset: Loads images and their corresponding age labels.
 - compute_images_quality_metrics: Computes quality metrics for each image.
 - check_images_quality: Checks image quality and flags low-quality images.
 
-#### image_processor.py
+#### `image_processor.py`
 
 - Functions to process images (e.g., sharpening, denoising, brightening).
 - Ensures processed images meet quality standards.
 
-#### process_images.py
+#### `process_images.py`
 
 - Applies image processing functions to the dataset.
 - Saves processed images to the processed_dataset directory.
 
-#### image_visualizer.py
+#### `image_visualizer.py`
 
 - visualize_distribution: Creates histograms for various image quality metrics and saves the plots.
 
-#### visualize_image_information.py
+#### `visualize_image_information.py`
 
-- Uses image_visualizer.py functions to generate and save plots for image quality metrics.
+- Uses `image_visualizer.py` functions to generate and save plots for image quality metrics.
 - Reads metadata from a CSV file and creates visualizations.
 
-#### australian_population.ipynb
+#### `australian_population.ipynb`
 
 - Analyzes Australian population distribution to create a target age distribution for resampling the dataset.
 
-#### resampling.ipynb
+#### `resampling.ipynb`
 
 - Performs resampling of the dataset to match the target age distribution.
 - Uses both up-sampling (data augmentation) and down-sampling techniques.
 
-#### train_model.py
+#### `train_model.py`
 
 - Loads the dataset and splits it into training and validation sets.
 - Defines the age classification model.
 - Trains the model and evaluates its performance.
 - Saves the trained model.
+
+## Data Analysis
+
+### 1. Age Distribution
+
+![image](visualizations/original_image/age_distribution.png)
+
+This histogram represents the distribution of images across different ages. Here's an explanation of the key points:
+
+- X-axis (Age): The x-axis shows the age groups, ranging from 20 to 50 years.
+- Y-axis (Number of Images): The y-axis shows the number of images corresponding to each age group.
+- Insight: This histogram shows the distribution of the number of images across different age groups in the dataset. The dataset includes images labeled with ages ranging from 20 to 50. There is a noticeable peak around the age of 25 and a lower count of images in the higher age ranges like 45-50.
+
+### 2. Laplacian Variance Distribution
+
+![image](visualizations/original_image/laplacian_variance_distribution.png)
+
+- X-axis: Laplacian Variance
+- Y-axis: Number of Images
+- Insight: This histogram shows the distribution of the Laplacian variance values, which measure the sharpness of the images. A low variance indicates a blurry image. Most images have a low Laplacian variance, suggesting that there are many blurry images in the dataset.
+
+### 3. Mean Intensity Distribution
+
+![image](visualizations/original_image/mean_intensity_distribution.png)
+
+- X-axis: Mean Intensity
+- Y-axis: Number of Images
+- Insight: This histogram shows the distribution of the mean intensity values of the images. The mean intensity is a measure of the overall brightness of an image. Most images have a mean intensity between 50 and 150, suggesting that the dataset contains images with a wide range of lighting conditions.
+
+### 4. Standard Deviation Distribution
+
+![image](visualizations/original_image/standard_deviation_distribution.png)
+
+- X-axis: Standard Deviation
+- Y-axis: Number of Images
+- Insight: This histogram shows the distribution of the standard deviation of pixel intensities in the images. The standard deviation is a measure of the noise or texture in an image. Most images have a standard deviation between 40 and 80, indicating moderate noise levels.
+
+### Image Quality Metrics
+
+#### 1. Blurry Images
+
+Blurriness can be quantified using the variance of the Laplacian. The Laplacian operator highlights regions of rapid intensity change, and its variance is a measure of how much the intensity changes in the image.
+
+**Mathematical Definition:**
+- **Laplacian:** The Laplacian is a second-order derivative operator that computes the sum of second-order derivatives in both the x and y directions.
+- **Variance of the Laplacian:** The variance of the Laplacian measures the spread of pixel intensity values after applying the Laplacian operator. Lower variance indicates less sharpness (i.e., more blurriness).
+
+#### 2. Noisy Images
+
+Noise in images can be quantified using the standard deviation of pixel intensity values. High noise levels usually lead to higher standard deviation due to the random fluctuations in pixel values.
+
+**Mathematical Definition:**
+- **Standard Deviation:** Measures the amount of variation or dispersion of a set of values. Higher standard deviation indicates higher noise.
+
+#### 3. Low Resolution
+
+The number of pixels in the horizontal and vertical dimensions of the image.
+
+#### 4. Poor Lighting
+
+Poor lighting can be quantified using the mean intensity of the image. Images that are too dark or too bright will have mean intensity values close to 0 or 255, respectively.
+
+**Thresholds for Image Quality Metrics:**
+- **Laplacian Variance (Blurriness):**
+  - Too Low: $< 100$ (indicates significant blurriness)
+  - Too High: $> 1000$ (generally not an issue unless excessively high due to noise)
+- **Mean Intensity (Brightness):**
+  - Too Low: $< 50$ (indicates the image is too dark)
+  - Too High: $> 200$ (indicates the image is too bright)
+- **Standard Deviation (Noise):**
+  - Too Low: $< 10$ (indicates lack of texture or overly smooth images)
+  - Too High: $> 100$ (indicates significant noise)
+- **Resolution:**
+  - Typically, images with resolution less than a certain threshold (e.g., $100 \times 100$ pixels) are considered low resolution.
+
